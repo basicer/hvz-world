@@ -1,6 +1,8 @@
 # Mayor's House
 
-<Cooldown id="search">
-<Take id="search" cooldown="search" time={90}>Search the Area</Take>
-<Need id="search"><Take id="safe-key">Safe Key</Take></Need>
+To do the search, you must stay in the Mayor's house during the search for 30 seconds.
+
+<Cooldown id="_search">
+<Take id="_search" cooldown="_search" time={30}>Search the Area</Take>
+<Need id="_search"><Take id="safe-key">I stayed in the house, take the Safe Key</Take></Need>
 </Cooldown>

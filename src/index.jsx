@@ -111,7 +111,7 @@ const Inventory = () => {
         <dialog id="dialog" ref={ref}>
             <header>Inventory</header>
             <ul>
-                {(inv || []).map((v) => <li>{v}</li>)}
+                {(inv || []).filter(x => !/^_/.test(x)).map((v) => <li>{v}</li>)}
             </ul>
         </dialog>
         <div style={{position: 'fixed', left: 5, right: 5, bottom: 5}}>
