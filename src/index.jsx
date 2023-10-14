@@ -37,15 +37,23 @@ const localStorageEffect = key => ({setSelf, onSet}) => {
 const inventory = atom({key: 'inventory', default: [], effects: [localStorageEffect('inventory')]});
 const where = atom({key: 'where', default: 'docks', effects: [localStorageEffect('where')]});
 
-function Take({id, children}) {
+function Take({id, onTake, children}) {
     let [inv, setInv] = useRecoilState(inventory);
     let take = () => {
-        enqueueSnackbar(`You took the ${id}`, { variant: 'success' });
+        enqueueSnackbar(onTake || `You took the ${id}`, { variant: 'success' });
         if (inv.indexOf(id) != -1) return;
         setInv(inv.concat([id]));
         
     }
     return <button onClick={take}>{children}</button>
+}
+
+function Go({id, children}) {
+    let [palce, setPlace] = useRecoilState(where);
+    let go = () => {
+       setPlace(id);
+    }
+    return <button onClick={go}>{children}</button>
 }
 
 function Need({id, children}) {
@@ -59,7 +67,8 @@ export const MarkdownOptions = {
 	overrides: {
 		a: { component: "a" },
         Take: { component: Take },
-        Need: { component: Need }
+        Need: { component: Need },
+        Go: { component: Go },
 	},
 };
 
