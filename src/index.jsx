@@ -1,5 +1,5 @@
 import { render } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
+import { useState, useEffect, useRef } from 'preact/hooks';
 import React from 'react';
 import Markdown from "markdown-to-jsx";
 import Router, {route} from 'preact-router';
@@ -84,7 +84,23 @@ const Page = ({name}) => {
 
 const Inventory = () => {
     let inv = useRecoilValue(inventory);
-    return <div>Inventory: {(inv || []).join(" ")}</div>
+    let ref = useRef();
+    useEffect(() => {
+        let close = () => ref.current.close();
+        ref.current.addEventListener("click", close);
+        return () => ref.current.removeEventListener("click", "close")
+    }, [ref])
+    return <>
+        <dialog id="dialog" ref={ref}>
+            <header>Inventory</header>
+            <ul>
+                {(inv || []).map((v) => <li>{v}</li>)}
+            </ul>
+        </dialog>
+        <div style={{position: 'fixed', left: 5, right: 5, bottom: 5}}>
+            <button style={{width: '100%'}} onClick={() => ref.current.showModal()}>Inventory</button>
+        </div>
+    </>
 }
 
 const Travel = ({name}) => {
