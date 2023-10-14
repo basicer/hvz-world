@@ -2,6 +2,10 @@
 
 You can make keys here.
 
-<Take id="gun-key">Make a Gun Key</Take>
-<Take id="hw-key">Make a Hardware Key</Take>
-<Take id="gas-key">Make a Gas Key</Take>
+You can make one key every five minuets.
+
+<Cooldown id="locksmith">
+    <Take id="gun-key" cooldown="locksmith">Make a Gun Key</Take>
+    <Take id="hw-key" cooldown="locksmith">Make a Hardware Key</Take>
+    <Take id="gas-key" cooldown="locksmith">Make a Gas Key</Take>
+</Cooldown>

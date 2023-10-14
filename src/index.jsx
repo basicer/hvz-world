@@ -35,11 +35,14 @@ const localStorageEffect = key => ({setSelf, onSet}) => {
 };
 
 const inventory = atom({key: 'inventory', default: [], effects: [localStorageEffect('inventory')]});
-const where = atom({key: 'where', default: 'docks', effects: [localStorageEffect('where')]});
+const where = atom({key: 'where', default: 'index', effects: [localStorageEffect('where')]});
+const cooldowns = atom({key: 'cooldowns', default: {}, effects: [localStorageEffect('cooldowns')]});
 
-function Take({id, onTake, children}) {
+function Take({id, onTake, cooldown, time, children}) {
     let [inv, setInv] = useRecoilState(inventory);
+    let [cds, setCooldowns] = useRecoilState(cooldowns);
     let take = () => {
+        if (cooldown) setCooldowns({...cds, [cooldown]: new Date().valueOf() + 1000 * (time || 300)})
         enqueueSnackbar(onTake || `You took the ${id}`, { variant: 'success' });
         if (inv.indexOf(id) != -1) return;
         setInv(inv.concat([id]));
@@ -59,8 +62,19 @@ function Go({id, children}) {
 function Need({id, children}) {
     let inv = useRecoilValue(inventory);
     if (inv.indexOf(id) != -1) 
-        return <div>{children}</div>
-    
+        return <div>{children}</div>   
+}
+
+function Cooldown({id, children}) {
+    let [cds, setCooldowns] = useRecoilState(cooldowns);
+    let [nao, setNao] = useState(new Date().valueOf());
+    useEffect(() => {
+        let i = setInterval(() => setNao(new Date().valueOf()), 500);
+        return () => clearInterval(i);
+    });
+    if (cds[id] > nao) return <div>Waiting {Math.floor((cds[id] - nao)/1000)}s...</div>
+
+    return <>{children}</>
 }
 
 export const MarkdownOptions = {
@@ -69,6 +83,7 @@ export const MarkdownOptions = {
         Take: { component: Take },
         Need: { component: Need },
         Go: { component: Go },
+        Cooldown: { component: Cooldown },
 	},
 };
 
@@ -79,7 +94,9 @@ const Page = ({name}) => {
         import(`./content/${name}.md`).then(c => setContent(c.default));
     }, [name])
 
-    return <Markdown options={MarkdownOptions}>{content}</Markdown>
+    return <>
+        <Markdown options={MarkdownOptions}>{content}</Markdown>
+    </>
 }
 
 const Inventory = () => {
@@ -106,7 +123,7 @@ const Inventory = () => {
 const Travel = ({name}) => {
     let setWhere = useSetRecoilState(where);
     useEffect(() => {
-        route('/');
+        route('/', true);
         setWhere(name);
     }, []);
     return <div>Travel?</div>
